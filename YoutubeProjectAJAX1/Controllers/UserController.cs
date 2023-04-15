@@ -1,19 +1,24 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YoutubeProjectAJAX1.Entities;
+using YoutubeProjectAJAX1.Helpers;
 using YoutubeProjectAJAX1.Models;
 
 namespace YoutubeProjectAJAX1.Controllers
 {
+    [Authorize(Roles ="admin", AuthenticationSchemes = "Cookies")]
     public class UserController : Controller
     {
         private readonly DatabaseContext _databaseContext;
         private readonly IMapper _mapper;
+        private readonly IHasher _hasher;
 
-        public UserController(DatabaseContext databaseContext, IMapper mapper)
+        public UserController(DatabaseContext databaseContext, IMapper mapper, IHasher hasher)
         {
             _databaseContext = databaseContext;
             _mapper = mapper;
+            _hasher = hasher;
         }
 
         public IActionResult Index()
@@ -39,7 +44,9 @@ namespace YoutubeProjectAJAX1.Controllers
                     ModelState.AddModelError(nameof(model.Username), "Username is already exitst");
                     return View(model);
                 }
+
                 User user = _mapper.Map<User>(model);
+                user.Password=_hasher.DoMD5HashedString(model.Password);
                 _databaseContext.Users.Add(user);
                 _databaseContext.SaveChanges();
 

@@ -5,7 +5,7 @@ using YoutubeProjectAJAX1.Models;
 
 namespace YoutubeProjectAJAX1.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Cookies")]
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -30,6 +30,19 @@ namespace YoutubeProjectAJAX1.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        //CookieAuth varsa birisi bu dosyayı get ile almak isterse üye olmak zorunda ve cookie key-value değerlerini bilmek zorunda.
+        [HttpGet]
+        public IActionResult GetData()
+        {
+            return Json(new { Name = "Murat", Surname = "Başeren" });
+        }
+
+        [HttpPost]
+        public IActionResult PostData([FromBody] PostDataApiModel model)
+        {
+            return Json(new { Error = false, Message = "Success" });
         }
     }
 }
